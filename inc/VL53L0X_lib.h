@@ -75,8 +75,8 @@ int32_t tofGetModel(tof_device_t* dev, int32_t* model, int32_t* revision);
  * millimeters
  *
  * \param[in] dev Pointer to the ToF device instance
- * \return Distance in millimeters, or -1 on error (e.g., timeout or sensor
- * failure)
+ * \return Distance in millimeters, or 65535 (0xFFFF) on timeout or error
+ * (e.g., sensor failure)
  */
 uint16_t tofReadDistance(tof_device_t* dev);
 /**
