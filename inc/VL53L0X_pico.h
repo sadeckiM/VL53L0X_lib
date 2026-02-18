@@ -13,6 +13,17 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "hardware/i2c.h"
+
+typedef struct tof_i2c_ops {
+    int (*i2c_read)(void *ctx, uint8_t addr, uint8_t *data, size_t len);
+    int (*i2c_write)(void *ctx, uint8_t addr, const uint8_t *data, size_t len);
+    void *user_ctx; // Pointer to user-defined context (e.g., hardware handle)
+} tof_i2c_ops_t;
+
+typedef struct tof_device {
+    tof_i2c_ops_t *i2c_ops;
+    uint8_t addr;
+} tof_device_t;
 //
 // Read the model and revision of the
 // tof sensor
