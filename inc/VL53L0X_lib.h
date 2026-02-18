@@ -61,7 +61,7 @@ typedef struct tof_i2c_ops {
 typedef struct tof_device {
     tof_i2c_ops_t* i2c_ops;
     uint8_t addr;
-    int32_t long_range_mode;
+    bool long_range_mode;
 } tof_device_t;
 
 /**
