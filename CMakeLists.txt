@@ -6,7 +6,5 @@ target_sources(VL53L0X_lib PRIVATE
 target_include_directories(VL53L0X_lib PUBLIC 
     inc
 )
-target_link_libraries(VL53L0X_lib PUBLIC
-    pico_stdlib
-    hardware_i2c
-)
+# Note: Do not link platform-specific libraries here to keep VL53L0X_lib platform-independent.
+# Platform or application targets should link pico_stdlib, hardware_i2c, etc. as needed.
