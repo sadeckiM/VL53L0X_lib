@@ -42,8 +42,7 @@ typedef struct tof_device {
 /**
  * \brief Create a default ToF device instance with Pico SDK I2C operations
  *
- * \return Pointer to a newly allocated tof_device_t instance, or NULL on
- * failure
+ * \return A tof_device_t instance with default values
  */
 tof_device_t tofCreateDefaultDevice(void);
 
