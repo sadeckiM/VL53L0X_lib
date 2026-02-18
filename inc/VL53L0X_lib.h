@@ -53,11 +53,10 @@ tof_device_t tofCreateDefaultDevice(void);
  * falls to the caller to ensure only one sensor is present on the I2C bus when
  * this function is called.
  *
- * \param[in] dev Pointer to the ToF device instance
+ * \param[in] dev Pointer to the ToF device instance (THIS FUNCTION WILL MODIFY THE DEVICE'S ADDRESS)
  * \param[in] new_addr The new I2C address to set for the sensor (must be a
  * valid 7-bit address)
- * \return 1 on success, or 0 on failure (e.g., invalid address or communication
- * error)
+ * \return 1 on success, or 0 on failure, -1 on invalid address (e.g., out of range or reserved address)
  */
 int32_t tofSetAddress(tof_device_t* dev, uint8_t new_addr);
 

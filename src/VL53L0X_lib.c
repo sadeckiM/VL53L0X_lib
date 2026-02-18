@@ -840,7 +840,11 @@ int32_t tofSetAddress(tof_device_t* dev, uint8_t new_addr) {
         printf("Invalid I2C address: 0x%02x\n", new_addr);
         return -1;
     }
-    uint8_t buffer[2] = {0x8A, new_addr};
     int32_t ret = writeReg(dev, 0x8A, new_addr);
-    return ret == 2;
+    if (ret != 2) {
+        printf("Failed to set new I2C address: 0x%02x\n", new_addr);
+        return 0;
+    }
+    dev->addr = new_addr;
+    return 1;
 }
