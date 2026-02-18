@@ -50,7 +50,7 @@ tof_i2c_ops_t i2c_ops = {
     .user_ctx = i2c0 // bus context, e.g., pointer to i2c instance
 };
 tof_device_t your_tof_device = tofCreateDefaultDevice();
-your_tof_device->ops = &i2c_ops;
+your_tof_device.i2c_ops = &i2c_ops;
 // Initialize and use the device as needed
 ```
 ---
