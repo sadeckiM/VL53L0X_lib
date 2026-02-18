@@ -37,3 +37,18 @@ Add the following to your top-level `CMakeLists.txt`:
 add_subdirectory(lib)
 target_link_libraries(<EXECUTABLE_NAME> PRIVATE libVL53L0X_pico)
 ```
+
+## Code example
+```c
+#include "VL53L0X_lib.hpp"
+// other includes...
+tof_i2c_ops_t i2c_ops = {
+    .i2c_write = my_i2c_write_function,
+    .i2c_read = my_i2c_read_function,
+    .user_ctx = i2c0, i2c1 // bus context, e.g., pointer to i2c instance
+};
+tof_device_t your_tof_device = tofCreateDefaultDevice();
+your_tof_device->ops = &i2c_ops;
+// Initialize and use the device as needed
+```
+
