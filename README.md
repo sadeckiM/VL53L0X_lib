@@ -42,7 +42,7 @@ target_link_libraries(<EXECUTABLE_NAME> PRIVATE VL53L0X_lib)
 
 ## 😑 Code example
 ```c
-#include "VL53L0X_lib.hpp"
+#include "VL53L0X_lib.h"
 // other includes...
 tof_i2c_ops_t i2c_ops = {
     .i2c_write = my_i2c_write_function,
