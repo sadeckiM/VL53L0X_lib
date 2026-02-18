@@ -84,7 +84,9 @@ uint16_t tofReadDistance(tof_device_t* dev);
  * setting it into continuous capture mode
  *
  * \param[in] dev Pointer to the ToF device instance to initialize
- * \return 1 on success, or a 0 on failure (e.g., calibration data is invalid)
+ * \return 1 on success; 0 if initialization fails for any reason (e.g., I2C
+ *         operations are not initialized, sensor communication fails, or
+ *         calibration data is invalid)
  */
 int32_t tofInit(tof_device_t* dev);
 
