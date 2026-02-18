@@ -44,10 +44,10 @@ typedef struct tof_i2c_ops {
      *
      *
      * \param[in] ctx Pointer to user-defined context (e.g., hardware handle)
-     * \param[in] addr Address of the I2C device to read from (7-bit address)
-     * \param[in] data Pointer to a buffer where the read data will be stored
-     * \param[in] len Amount of bytes to read from the device
-     * \param[in] nostop If true, the function should not send a stop condition after the read operation (useful for repeated start conditions)
+     * \param[in] addr Address of the I2C device to write to (7-bit address)
+     * \param[in] data Pointer to a buffer containing data to be written
+     * \param[in] len Amount of bytes to write to the device
+     * \param[in] nostop If true, the function should not send a stop condition after the write operation (useful for repeated start conditions)
      * \return Number of bytes written on success, or a negative value on error (e.g., I2C communication failure)
      */
     int32_t (*i2c_write)(void* ctx, uint8_t addr, const uint8_t* data,
