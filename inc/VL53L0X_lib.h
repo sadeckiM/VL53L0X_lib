@@ -65,9 +65,17 @@ typedef struct tof_device {
 } tof_device_t;
 
 /**
- * \brief Create a default ToF device instance with Pico SDK I2C operations
+ * \brief Create a default ToF device instance with uninitialized I2C operations
  *
- * \return A tof_device_t instance with default values
+ * The returned device has its fields set to library defaults (for example,
+ * a default I2C address and range mode), but the \c i2c_ops pointer is
+ * intentionally left as NULL. The caller must assign a valid ::tof_i2c_ops_t
+ * implementation to \c dev->i2c_ops (and, if needed, \c user_ctx) before
+ * calling any functions that perform I2C communication (such as ::tofInit
+ * or ::tofReadDistance).
+ *
+ * \return A ::tof_device_t instance with default configuration and
+ *         \c i2c_ops set to NULL.
  */
 tof_device_t tofCreateDefaultDevice(void);
 
