@@ -12,9 +12,9 @@
  * \brief Header file for VL53L0X Time-of-Flight sensor library
  */
 
-#include "hardware/i2c.h"
-#include "pico/binary_info.h"
-#include "pico/stdlib.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
