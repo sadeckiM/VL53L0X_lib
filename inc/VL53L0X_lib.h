@@ -23,8 +23,33 @@
  * different hardware implementations
  */
 typedef struct tof_i2c_ops {
+    /**
+     * \brief Pointer to function for reading data from the I2C bus. 
+     * The function should read 'len' bytes from the device at 'addr' into the 'data' buffer. If 'nostop' is true, the function should not send a stop condition after the read operation, allowing for a repeated start if needed.
+     * 
+     *
+     * \param[in] ctx Pointer to user-defined context (e.g., hardware handle)
+     * \param[in] addr Address of the I2C device to read from (7-bit address)
+     * \param[in] data Pointer to a buffer where the read data will be stored
+     * \param[in] len Amount of bytes to read from the device
+     * \param[in] nostop If true, the function should not send a stop condition after the read operation (useful for repeated start conditions)
+     * \return Number of bytes read on success, or a negative value on error (e.g., I2C communication failure)
+     */
     int32_t (*i2c_read)(void* ctx, uint8_t addr, uint8_t* data, size_t len,
                         bool nostop);
+
+    /**
+     * \brief Pointer to function for writing data to the I2C bus.
+     * The function should write 'len' bytes from the 'data' buffer to the device at 'addr'. If 'nostop' is true, the function should not send a stop condition after the write operation, allowing for a repeated start if needed.
+     *
+     *
+     * \param[in] ctx Pointer to user-defined context (e.g., hardware handle)
+     * \param[in] addr Address of the I2C device to read from (7-bit address)
+     * \param[in] data Pointer to a buffer where the read data will be stored
+     * \param[in] len Amount of bytes to read from the device
+     * \param[in] nostop If true, the function should not send a stop condition after the read operation (useful for repeated start conditions)
+     * \return Number of bytes written on success, or a negative value on error (e.g., I2C communication failure)
+     */
     int32_t (*i2c_write)(void* ctx, uint8_t addr, const uint8_t* data,
                          size_t len, bool nostop);
     void* user_ctx; // Pointer to user-defined context (e.g., hardware handle)
