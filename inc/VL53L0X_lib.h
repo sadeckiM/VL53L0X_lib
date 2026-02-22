@@ -1,5 +1,10 @@
 #ifndef VL53L0X_LIB_H_
 #define VL53L0X_LIB_H_
+
+/**
+ * \file VL53L0X_lib.h
+ * \brief Header file for VL53L0X Time-of-Flight sensor library
+ */
 /*
  * VL53L0X Library Fork
  * Based on work by Pololu, bitbank2, and danjperron.
@@ -7,11 +12,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  */
-/**
- * \file VL53L0X_lib.h
- * \brief Header file for VL53L0X Time-of-Flight sensor library
- */
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -52,6 +52,13 @@ typedef struct tof_i2c_ops {
      */
     int32_t (*i2c_write)(void* ctx, uint8_t addr, const uint8_t* data,
                          size_t len, bool nostop);
+    /**
+     * \brief Pointer to function for introducing a delay in microseconds.
+     *
+     * \param[in] microseconds amount of time to delay in microseconds
+     * \return 0 on success, or a negative value on error (e.g., if the delay function is not implemented or fails to execute properly)
+     */
+    int32_t (*tof_delay_us)(uint32_t microseconds);
     void* user_ctx; // Pointer to user-defined context (e.g., hardware handle)
 } tof_i2c_ops_t;
 

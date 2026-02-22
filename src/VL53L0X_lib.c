@@ -25,18 +25,12 @@
 // no changes to the core library code.
 #include "VL53L0X_lib.h"
 
-#define usleep(A) sleep_us(A)
+#define __TOF_LIBRARY_INTERNAL__
+#include "VL53L0X_internal.h"
 
 static unsigned char stop_variable;
 static uint32_t measurement_timing_budget_us;
 
-static unsigned char readReg(tof_device_t* dev, unsigned char ucAddr);
-static unsigned short readReg16(tof_device_t* dev, unsigned char ucAddr);
-static void writeReg16(tof_device_t* dev, unsigned char ucAddr,
-                       unsigned short usValue);
-static int32_t writeReg(tof_device_t* dev, unsigned char ucAddr,
-                     unsigned char ucValue);
-static void writeRegList(tof_device_t* dev, unsigned char* ucList);
 static int initSensor(tof_device_t* dev);
 static int performSingleRefCalibration(tof_device_t* dev,
                                        uint8_t vhv_init_byte);
@@ -115,110 +109,6 @@ int32_t tofInit(tof_device_t* dev) {
 //
 // Read a pair of registers as a 16-bit value
 //
-static unsigned short readReg16(tof_device_t* dev, unsigned char ucAddr) {
-    unsigned char ucTemp[2];
-
-    dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, &ucAddr, 1,
-                            true);
-    dev->i2c_ops->i2c_read(dev->i2c_ops->user_ctx, dev->addr, ucTemp, 2, false);
-    // Replaces:
-    // i2c_write_blocking(i2c_port, addr, &ucAddr, 1, true);
-    // i2c_read_blocking(i2c_port, addr, ucTemp, 2, false);
-    return (unsigned short)((ucTemp[0] << 8) + ucTemp[1]);
-} /* readReg16() */
-
-//
-// Read a single register value from I2C device
-//
-static unsigned char readReg(tof_device_t* dev, unsigned char ucAddr) {
-    unsigned char ucTemp;
-    dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, &ucAddr, 1,
-                            true);
-    dev->i2c_ops->i2c_read(dev->i2c_ops->user_ctx, dev->addr, &ucTemp, 1,
-                           false);
-    // Replaces:
-    // i2c_write_blocking(i2c, addr, &ucAddr, 1, true);
-    // i2c_read_blocking(i2c, addr, &ucTemp, 1, false);
-
-    return ucTemp;
-} /* ReadReg() */
-
-static void readMulti(tof_device_t* dev, unsigned char ucAddr,
-                      unsigned char* pBuf, int iCount) {
-    dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, &ucAddr, 1,
-                            true);
-    dev->i2c_ops->i2c_read(dev->i2c_ops->user_ctx, dev->addr, pBuf, iCount,
-                           false);
-    // Replaces:
-    // i2c_write_blocking(i2c, addr, &ucAddr, 1, true);
-    // i2c_read_blocking(i2c, addr, pBuf, iCount, false);
-} /* readMulti() */
-
-static void writeMulti(tof_device_t* dev, unsigned char ucAddr,
-                       unsigned char* pBuf, int iCount) {
-    unsigned char ucTemp[16];
-    int rc;
-
-    ucTemp[0] = ucAddr;
-    memcpy(&ucTemp[1], pBuf, iCount);
-    dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, ucTemp,
-                            iCount + 1, false);
-    // Replaces:
-    // i2c_write_blocking(i2c, addr, ucTemp, iCount + 1, false);
-} /* writeMulti() */
-//
-// Write a 16-bit value to a register
-//
-static void writeReg16(tof_device_t* dev, unsigned char ucAddr,
-                       unsigned short usValue) {
-    unsigned char ucTemp[4];
-    int rc;
-
-    ucTemp[0] = ucAddr;
-    ucTemp[1] = (unsigned char)(usValue >> 8); // MSB first
-    ucTemp[2] = (unsigned char)usValue;
-
-    dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, ucTemp, 3,
-                            false);
-    // Replaces:
-    // i2c_write_blocking(i2c, addr, ucTemp, 3, false);
-
-} /* writeReg16() */
-//
-// Write a single register/value pair
-//
-static int32_t writeReg(tof_device_t* dev, unsigned char ucAddr,
-                     unsigned char ucValue) {
-    unsigned char ucTemp[2];
-    int rc;
-
-    ucTemp[0] = ucAddr;
-    ucTemp[1] = ucValue;
-    int ret = dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, ucTemp, 2,
-                            false);
-    // Replaces:
-    // i2c_write_blocking(i2c, addr, ucTemp, 2, false);
-    
-    return ret;
-
-} /* writeReg() */
-
-//
-// Write a list of register/value pairs to the I2C device
-//
-static void writeRegList(tof_device_t* dev, unsigned char* ucList) {
-    unsigned char ucCount = *ucList++; // count is the first element in the list
-    int rc;
-    while (ucCount) {
-        dev->i2c_ops->i2c_write(dev->i2c_ops->user_ctx, dev->addr, ucList, 2,
-                                false);
-        // Replaces:
-        // i2c_write_blocking(i2c, addr, ucList, 2, false);
-        ucList += 2;
-        ucCount--;
-    }
-
-} /* writeRegList() */
 
 //
 // Register init lists consist of the count followed by register/value pairs
@@ -261,7 +151,7 @@ static int getSpadInfo(tof_device_t* dev, unsigned char* pCount,
         if (readReg(dev, 0x83) != 0x00)
             break;
         iTimeout++;
-        usleep(5000);
+        dev->i2c_ops->tof_delay_us(5000);
     }
     if (iTimeout == MAX_TIMEOUT) {
         fprintf(stderr, "Timeout while waiting for SPAD info\n");
@@ -676,7 +566,7 @@ static int performSingleRefCalibration(tof_device_t* dev,
     iTimeout = 0;
     while ((readReg(dev, RESULT_INTERRUPT_STATUS) & 0x07) == 0) {
         iTimeout++;
-        usleep(5000);
+        dev->i2c_ops->tof_delay_us(5000);
         if (iTimeout > 100) {
             return 0;
         }
@@ -769,7 +659,7 @@ uint16_t readRangeContinuousMillimeters(tof_device_t* dev) {
 
     while ((readReg(dev, RESULT_INTERRUPT_STATUS) & 0x07) == 0) {
         iTimeout++;
-        usleep(5000);
+        dev->i2c_ops->tof_delay_us(5000);
         if (iTimeout > 50) {
             return -1;
         }
@@ -803,7 +693,7 @@ uint16_t tofReadDistance(tof_device_t* dev) {
     iTimeout = 0;
     while (readReg(dev, SYSRANGE_START) & 0x01) {
         iTimeout++;
-        usleep(5000);
+        dev->i2c_ops->tof_delay_us(5000);
         if (iTimeout > 50) {
             return -1;
         }
